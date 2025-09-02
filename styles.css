@@ -1,0 +1,100 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #3f3f3f;
+  color: #0a2a5e;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 72%;
+  margin: 32px auto;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  margin-bottom: 12px;
+  color: rgb(252, 252, 252);
+}
+
+/* Episode list */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+li {
+  cursor: pointer;
+  padding: 10px;
+  background: #747474;
+  border-radius: 6px;
+  margin: 6px 0;
+  transition: background 0.12s ease;
+}
+
+li:hover {
+  background: #b0c4ff;
+}
+
+/* Highlight current */
+li.current {
+  background: #cfe0ff;
+  font-weight: 700;
+}
+
+/* Player wrapper */
+#player-wrapper {
+  margin-top: 16px;
+}
+
+#player {
+  border-radius: 6px;
+  background: #000;
+  max-height: 70vh;
+}
+
+/* Controls */
+.controls {
+  margin-top: 12px;
+  display:flex;
+  gap:8px;
+  justify-content:center;
+}
+
+.controls button {
+  background: #0a2a5e;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.controls button:hover {
+  background: #163d82;
+}
+
+/* Open in Google Drive button inside <a> */
+.controls a button {
+  background: #e07b00;
+  color: white;
+}
+
+.controls a button:hover {
+  background: #c96c00;
+}
+
+/* Error / empty message */
+.empty {
+  margin: 10px 0;
+  color: #900;
+}
+.debug { font-size:0.9rem; color:#900; margin-top:8px; }
+.note { font-size:0.9rem; color:#444; margin-top:8px; }
