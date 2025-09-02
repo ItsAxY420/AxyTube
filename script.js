@@ -126,15 +126,15 @@ function playIndex(idx) {
   const previewUrl = `https://drive.google.com/file/d/${f.id}/preview`;
 
   if ((f.mimeType || "").startsWith("video/") || /\.(mp4|webm|ogg|mov|m4v)$/i.test(f.name)) {
-    iframeEl.style.display = "none";
-    videoEl.style.display = "block";
+    iframeEl.style.display = "center";
+    videoEl.style.display = "center";
     videoEl.src = directUrl;
     openBtn.href = f.webViewLink || previewUrl;
     videoEl.play().catch(()=>{});
   } else {
-    videoEl.style.display = "none";
+    videoEl.style.display = "center";
     videoEl.removeAttribute("src");
-    iframeEl.style.display = "block";
+    iframeEl.style.display = "center";
     iframeEl.src = previewUrl;
     openBtn.href = f.webViewLink || previewUrl;
   }
@@ -145,10 +145,10 @@ videoEl.addEventListener("error", () => {
   const f = files[currentIndex];
   if (!f) return;
   videoEl.style.display = "none";
-  iframeEl.style.display = "block";
+  iframeEl.style.display = "center";
   iframeEl.src = `https://drive.google.com/file/d/${f.id}/preview`;
   openBtn.href = f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`;
-  debugEl.style.display = "block";
+  debugEl.style.display = "center";
   debugEl.innerText = "Native <video> playback failed; using Drive preview fallback.";
 });
 

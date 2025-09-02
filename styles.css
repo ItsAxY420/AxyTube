@@ -26,16 +26,18 @@ h1 {
 ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
+  justify-content:center;
 }
 
 li {
   cursor: pointer;
   padding: 10px;
   background: #747474;
-  border-radius: 6px;
-  margin: 6px 0;
+  border-radius: 10px;
+  margin: 15px 0;
   transition: background 0.12s ease;
+  justify-content:center;
 }
 
 li:hover {
@@ -50,13 +52,15 @@ li.current {
 
 /* Player wrapper */
 #player-wrapper {
-  margin-top: 16px;
+  margin-top: 0px;
+  justify-content:center;
 }
 
 #player {
   border-radius: 6px;
   background: #000;
   max-height: 70vh;
+  justify-content:center;
 }
 
 /* Controls */
