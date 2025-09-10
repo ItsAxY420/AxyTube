@@ -144,7 +144,7 @@ function playIndex(idx) {
 videoEl.addEventListener("error", () => {
   const f = files[currentIndex];
   if (!f) return;
-  videoEl.style.display = "none";
+  videoEl.style.display = "center";
   iframeEl.style.display = "center";
   iframeEl.src = `https://drive.google.com/file/d/${f.id}/preview`;
   openBtn.href = f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`;
