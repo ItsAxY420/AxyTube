@@ -5,91 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AxyTube — Axy's Favourite TV Shows</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    #video-player { width:60%; height:465px; max-height:70vh; display:none; border-radius:0px; background:#000; }
-    #drive-iframe { width:60%; height:465px; display:center; border-radius:0px; border:0; }
-    .list li.current { font-weight:700; background:#cfe0ff; }
-    .note { font-size:0.9rem; color:#444; margin-top:8px; }
-    .debug { font-size:0.85rem; color:#900; margin-top:8px; }
-
-    .tab-btn {
-      background:#0a2a5e;
-      color:#fff;
-      border:none;
-      padding:10px 16px;
-      border-radius:6px;
-      cursor:pointer;
-      margin-bottom:10px;
-    }
-    .tab-btn:hover { background:#163d82; }
-
-    /* Season collapsible */
-    .season-block { margin-top:10px; }
-    .season-toggle {
-      background:#345;
-      color:#fff;
-      border:none;
-      padding:8px 14px;
-      border-radius:6px;
-      cursor:pointer;
-      margin:6px 0;
-      width:100%;
-      text-align:left;
-    }
-    .season-toggle:hover { background:#567; }
-    .season-content {
-      display:none;
-      margin:6px 0 12px 0;
-    }
-  </style>
 </head>
 <body>
   <div class="container">
     <h1>AxyTube</h1>
     <p class="subtitle">Axy Favourite Shows to fall asleep by</p>
 
-    <!-- Bojack Horseman Tab -->
-    <button class="tab-btn" onclick="toggleMain()">Bojack Horseman</button>
-    <a href="https://www.watchregularshow.com/" class="tab-btn">Regular Show - redirect</a>
-    <a href="http://hdrezka.ag/cartoons/comedy/2136-rik-i-morti-2013-latest/238-subtitles.html" class="tab-btn">Reick And Morty - redirect</a>
-    <a href="https://hdrezka.ag/animation/adventures/72634-rik-i-morti-anime-2024-latest/565-mnogogolosiy-tvshows.html" class="tab-btn">Reick And Morty Anime - redirect</a>
-    <div id="bojack-season" class="season">
+    <!-- Bojack Horseman Tab (closed by default) -->
+    <button class="tab-btn" id="bojackToggle">Bojack Horseman</button>
 
+    <div id="bojack-season" class="season" style="display:none;">
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s1')">Season 1</button>
         <div id="s1" class="season-content">
           <ul class="list" id="videoList-s1"></ul>
         </div>
       </div>
-
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s2')">Season 2</button>
         <div id="s2" class="season-content">
           <ul class="list" id="videoList-s2"></ul>
         </div>
       </div>
-
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s3')">Season 3</button>
         <div id="s3" class="season-content">
           <ul class="list" id="videoList-s3"></ul>
         </div>
       </div>
-
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s4')">Season 4</button>
         <div id="s4" class="season-content">
           <ul class="list" id="videoList-s4"></ul>
         </div>
       </div>
-
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s5')">Season 5</button>
         <div id="s5" class="season-content">
           <ul class="list" id="videoList-s5"></ul>
         </div>
       </div>
-
       <div class="season-block">
         <button class="season-toggle" onclick="toggleSeason('s6')">Season 6</button>
         <div id="s6" class="season-content">
@@ -99,13 +54,14 @@
     </div>
 
     <div id="playerWrap">
-      <video id="video-player" controls playsinline></video>
-      <iframe id="drive-iframe" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      <video id="video-player" controls playsinline webkit-playsinline x-webkit-airplay="allow" style="display:block;"></video>
+      <iframe id="drive-iframe" style="display:none;"></iframe>
 
       <div class="controls">
         <button id="prevBtn">⟵ Prev</button>
         <button id="nextBtn">Next ⟶</button>
         <a id="openBtn" target="_blank" rel="noopener"><button>Open in Google Drive</button></a>
+        <button id="popOutBtn">Pop out</button>
       </div>
 
       <div id="empty" class="empty" style="display:none;">No playable videos found in this folder.</div>
@@ -115,13 +71,16 @@
   </div>
 
   <script>
-    function toggleMain() {
-      const box = document.getElementById("bojack-season");
-      box.style.display = box.style.display === "block" ? "none" : "block";
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggle = document.getElementById('bojackToggle');
+      toggle.addEventListener('click', function () {
+        const box = document.getElementById('bojack-season');
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+      });
+    });
     function toggleSeason(id) {
       const section = document.getElementById(id);
-      section.style.display = section.style.display === "block" ? "none" : "block";
+      section.style.display = section.style.display === 'block' ? 'none' : 'block';
     }
   </script>
   <script src="script.js"></script>

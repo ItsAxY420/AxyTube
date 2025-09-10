@@ -1,104 +1,73 @@
+/* styles.css */
+
 body {
+  background: #111;
+  color: #eee;
   font-family: Arial, sans-serif;
-  background: rgb(41, 41, 41);
-  color: #355891;
-  text-align: center;
   margin: 0;
   padding: 0;
+  display:flex;
+  justify-content:center;
 }
 
 .container {
-  width: 72%;
-  margin: 32px auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 1100px;
+  box-sizing: border-box;
 }
 
-h1 {
-  font-size: 2em;
-  margin-bottom: 6px;
-}
+h1 { margin: 6px 0; }
+.subtitle { margin: 0 0 12px 0; color: #ccc; }
 
-.subtitle {
-  margin-bottom: 12px;
-  color: rgb(252, 252, 252);
-}
-
-/* Episode list */
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 6px 0;
-  justify-content:center;
-}
-
-li {
-  cursor: pointer;
-  padding: 10px;
-  background: #747474;
-  border-radius: 10px;
-  margin: 15px 0;
-  transition: background 0.12s ease;
-  justify-content:center;
-}
-
-li:hover {
-  background: #b0c4ff;
-}
-
-/* Highlight current */
-li.current {
-  background: #cfe0ff;
-  font-weight: 700;
-}
-
-/* Player wrapper */
-#player-wrapper {
-  margin-top: 0px;
-  justify-content:center;
-}
-
-#player {
-  border-radius: 0px;
-  background: #000;
-  max-height: 50vh;
-  justify-content:center;
-}
-
-/* Controls */
-.controls {
-  margin-top: 12px;
-  display:flex;
-  gap:8px;
-  justify-content:center;
-}
-
-.controls button {
+.tab-btn, .season-toggle, .controls button {
   background: #0a2a5e;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 8px 14px;
+  padding: 10px 16px;
+  margin: 6px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
-
-.controls button:hover {
+.tab-btn:hover, .season-toggle:hover, .controls button:hover {
   background: #163d82;
 }
 
-/* Open in Google Drive button inside <a> */
-.controls a button {
-  background: #e07b00;
-  color: white;
+#playerWrap {
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
-.controls a button:hover {
-  background: #c96c00;
+#video-player {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 8px;
 }
 
-/* Error / empty message */
-.empty {
-  margin: 10px 0;
-  color: #900;
+#drive-iframe { width: 100%; max-width: 960px; height: 540px; border: 0; }
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
 }
-.debug { font-size:0.9rem; color:#900; margin-top:8px; }
-.note { font-size:0.9rem; color:#444; margin-top:8px; }
+.list li {
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.03);
+  margin: 4px 0;
+  text-align: left;
+}
+.list li.current {
+  background: rgba(96,150,255,0.14);
+  font-weight: 700;
+}
+.debug { color: #ffcc00; }
+.note { color: #bbb; margin-top: 8px; }
