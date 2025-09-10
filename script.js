@@ -1,12 +1,11 @@
-
 // script.js
-// Restored & fixed version — attempts native <video> playback from Google Drive first,
-// and falls back to Drive preview iframe if native playback fails.
+// Attempt native <video> playback from Google Drive (alt=media for raw bytes) first,
+// and fall back to Drive preview iframe if native playback fails.
 
 // ===== CONFIG =====
 const API_KEY = "AIzaSyDNA7a_EgNLjO8DMGL6cy8RtUdASlQCGSk";
 const FOLDERS = {
-  s1: "1neuN7SSXoxv-ot3ELiGt2BpranjD_6dr", // Season 1
+  s1: "12QHYD56V3f7wGd04yChF1prfpwsb91Hc", // Season 1
   s2: "1i7h3gme1Lm2_Jwj5iZ_e5audeg1s8MeR",
   s3: "1_9q3Ay6qADCNdSqBCDJ5cg0ZQ7FaTm4N",
   s4: "1Kck7onbfUX6l8xwwsK2eXe0D6YwaYJSf",
@@ -33,6 +32,7 @@ let currentIndex = 0;
 
 function driveListUrl(folderId) {
   const q = `'${folderId}' in parents and trashed=false`;
+  // request mimeType so we can detect mp4/video files
   return `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,thumbnailLink)&pageSize=500&orderBy=name`;
 }
 
@@ -101,21 +101,62 @@ function playSeasonIndex(seasonId, idx) {
 function playFile(f, seasonId, idx) {
   if (!f) return;
 
-  const directUrl = `https://drive.google.com/uc?export=download&id=${f.id}`;
+  // alt=media endpoint (serves raw file bytes with correct headers) — preferred for direct playback
+  const apiAltMedia = `https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}`;
+  // traditional uc download link (sometimes works but can return HTML for large files)
+  const directUc = `https://drive.google.com/uc?export=download&id=${f.id}`;
   const previewUrl = `https://drive.google.com/file/d/${f.id}/preview`;
 
-  try {
-    if (videoEl) {
+  const name = (f.name || '').toLowerCase();
+  const mime = (f.mimeType || '').toLowerCase();
+
+  // Decide whether to try native playback:
+  // - If Drive reports a video mimeType (video/*) -> use alt=media
+  // - Or if filename ends with .mp4 -> use alt=media and claim video/mp4
+  let tryNative = false;
+  let sourceUrl = directUc;
+  let sourceType = mime || '';
+
+  if (mime.startsWith('video/')) {
+    tryNative = true;
+    sourceUrl = apiAltMedia;
+    sourceType = mime;
+  } else if (name.endsWith('.mp4')) {
+    tryNative = true;
+    sourceUrl = apiAltMedia;
+    sourceType = 'video/mp4';
+  } else {
+    // not a known video type; we will fallback to iframe (Drive preview)
+    tryNative = false;
+  }
+
+  if (tryNative && videoEl) {
+    // Prepare video element for new source
+    try {
       videoEl.pause();
-      videoEl.removeAttribute('poster');
-      videoEl.src = directUrl;
-      videoEl.style.display = 'block';
-    }
+    } catch(e){}
+    videoEl.removeAttribute('poster');
+
+    // remove existing <source> children and set a single new one (clean)
+    while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+    const sourceEl = document.createElement('source');
+    sourceEl.src = sourceUrl;
+    if (sourceType) sourceEl.type = sourceType;
+    videoEl.appendChild(sourceEl);
+
+    videoEl.style.display = 'block';
     if (iframeEl) iframeEl.style.display = 'none';
     if (openBtn) openBtn.href = f.webViewLink || previewUrl;
-    if (debugEl) { debugEl.style.display = 'none'; debugEl.innerText = ''; }
-    videoEl.play().catch(()=>{ fallbackToIframe(f); });
-  } catch (e) {
+    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = `Trying native playback (${sourceType || 'unknown type'}) — ${sourceUrl}`; }
+
+    // load then play; if play() or loading fails, fallback to iframe
+    videoEl.load();
+    videoEl.play().catch(err => {
+      console.warn('Native play() failed; falling back to iframe: ', err);
+      fallbackToIframe(f);
+    });
+  } else {
+    // Not a video type or native attempt not possible — use Drive preview iframe
     fallbackToIframe(f);
   }
 }
@@ -124,7 +165,7 @@ function fallbackToIframe(f) {
   if (!f) return;
   const previewUrl = `https://drive.google.com/file/d/${f.id}/preview`;
   try {
-    if (videoEl) { try { videoEl.pause(); } catch(e){} videoEl.removeAttribute('src'); videoEl.style.display = 'none'; }
+    if (videoEl) { try { videoEl.pause(); } catch(e){} videoEl.removeAttribute('src'); videoEl.style.display = 'none'; while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild); }
     if (iframeEl) { iframeEl.src = previewUrl; iframeEl.style.width = '100%'; iframeEl.style.height = '480px'; iframeEl.style.display = 'block'; }
     if (openBtn) openBtn.href = f.webViewLink || previewUrl;
     if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = 'Native playback failed — using Drive preview.'; }
