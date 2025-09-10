@@ -8,7 +8,7 @@ const FOLDERS = {
   s1: "12QHYD56V3f7wGd04yChF1prfpwsb91Hc", // Season 1
   s2: "1cdeSnoOsSEXYAlOQfCGqN97VApK2PmJ6",
   s3: "1VzrJLiby1QznKp_vBcBECtCQvZYpHWyH",
-  s4: "1Kck7onbfUX6l8xwwsK2eXe0D6YwaYJSf",
+  s4: "12tqVxlqgb3GN-FtxBSpnL8d-HuzJhXvE",
   s5: "11z6r_KKDqasqkuNDjF2_gavDqkuT1BOh",
   s6: "1MfL6TzzV8k7n6cEqYXh62vfge2pqYjjV",
 };
