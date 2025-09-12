@@ -24,6 +24,7 @@ const openBtn = document.getElementById("openBtn");
 const emptyEl = document.getElementById("empty");
 const debugEl = document.getElementById("debug");
 const popOutBtn = document.getElementById("popOutBtn");
+const autoplayChk = document.getElementById("autoplayChk"); // ✅ NEW
 
 // ===== State =====
 const seasons = {};
@@ -110,9 +111,6 @@ function playFile(f, seasonId, idx) {
   const name = (f.name || '').toLowerCase();
   const mime = (f.mimeType || '').toLowerCase();
 
-  // Decide whether to try native playback:
-  // - If Drive reports a video mimeType (video/*) -> use alt=media
-  // - Or if filename ends with .mp4 -> use alt=media and claim video/mp4
   let tryNative = false;
   let sourceUrl = directUc;
   let sourceType = mime || '';
@@ -126,18 +124,14 @@ function playFile(f, seasonId, idx) {
     sourceUrl = apiAltMedia;
     sourceType = 'video/mp4';
   } else {
-    // not a known video type; we will fallback to iframe (Drive preview)
     tryNative = false;
   }
 
   if (tryNative && videoEl) {
-    // Prepare video element for new source
     try {
       videoEl.pause();
     } catch(e){}
     videoEl.removeAttribute('poster');
-
-    // remove existing <source> children and set a single new one (clean)
     while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
     const sourceEl = document.createElement('source');
     sourceEl.src = sourceUrl;
@@ -149,14 +143,12 @@ function playFile(f, seasonId, idx) {
     if (openBtn) openBtn.href = f.webViewLink || previewUrl;
     if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = `Trying native playback (${sourceType || 'unknown type'}) — ${sourceUrl}`; }
 
-    // load then play; if play() or loading fails, fallback to iframe
     videoEl.load();
     videoEl.play().catch(err => {
       console.warn('Native play() failed; falling back to iframe: ', err);
       fallbackToIframe(f);
     });
   } else {
-    // Not a video type or native attempt not possible — use Drive preview iframe
     fallbackToIframe(f);
   }
 }
@@ -174,6 +166,13 @@ function fallbackToIframe(f) {
 
 if (videoEl) {
   videoEl.addEventListener('error', () => { fallbackToIframe(seasons[currentSeason] && seasons[currentSeason][currentIndex]); });
+
+  // ✅ NEW: Autoplay next when video ends
+  videoEl.addEventListener("ended", () => {
+    if (autoplayChk && autoplayChk.checked) {
+      next();
+    }
+  });
 }
 
 function next() {
