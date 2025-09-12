@@ -10,7 +10,7 @@ const FOLDERS = {
   s3: "1VzrJLiby1QznKp_vBcBECtCQvZYpHWyH",
   s4: "12tqVxlqgb3GN-FtxBSpnL8d-HuzJhXvE",
   s5: "1mK_NLmrm9e-V0G6gsPTUtOblATIspKmE",
-  s6: "1MfL6TzzV8k7n6cEqYXh62vfge2pqYjjV",
+  s6: "1VCuvMHsakR7UYK-ND1l4ekOrx37ubfQD",
 };
 
 const VIDEO_ONLY = true;
