@@ -1,60 +1,95 @@
 // script.js
-// Attempt native <video> playback from Google Drive (alt=media for raw bytes) first,
-// and fall back to Drive preview iframe if native playback fails.
+// Pure native <video> playback from Google Drive (alt=media). NO IFRAME on page.
 
 // ===== CONFIG =====
 const API_KEY = "AIzaSyDNA7a_EgNLjO8DMGL6cy8RtUdASlQCGSk";
+
+// BoJack static mapping (your existing IDs)
 const FOLDERS = {
-  s1: "12QHYD56V3f7wGd04yChF1prfpwsb91Hc", // Season 1
+  // BoJack
+  s1: "12QHYD56V3f7wGd04yChF1prfpwsb91Hc",
   s2: "1cdeSnoOsSEXYAlOQfCGqN97VApK2PmJ6",
   s3: "1VzrJLiby1QznKp_vBcBECtCQvZYpHWyH",
   s4: "12tqVxlqgb3GN-FtxBSpnL8d-HuzJhXvE",
   s5: "1mK_NLmrm9e-V0G6gsPTUtOblATIspKmE",
   s6: "1VCuvMHsakR7UYK-ND1l4ekOrx37ubfQD",
+
+  // Regular Show (your IDs)
+  r1: "1IfcOaJzitg8XvUbx6SVz3-VOmXvR9wzw",
+  r2: "11kKVirM0bk8SmNvCJKCv-cuaUNb-pXD6",
+  r3: "1-LIAV0dO3Gj-3a7-TFjztZQtklMHCcSq",
+  r4: "1SMia0vvwyGb0SVURwrD81RLtGNOO6dVY",
+  r5: "1wU9p7vr9HqmgPDYIQNOlmmWD23S-n9FQ",
+  r6: "1wzb5ZtcXUN0VszD3MZSKObjoQQGNbnpg",
+  r7: "1Pi8oGZfTt2VtmBiUbn00OCOlUS8cFkdR",
+  r8: "1sM-m97cBux-Z-D37FxDmiqczsnEQLDBS",
+  r9: "1qFY1rzRZTCsrRlqaJyurdkWH0fSriMFd"
 };
 
 const VIDEO_ONLY = true;
 
 // ===== DOM =====
 const videoEl = document.getElementById("video-player");
-let iframeEl = document.getElementById("drive-iframe");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const openBtn = document.getElementById("openBtn");
 const emptyEl = document.getElementById("empty");
 const debugEl = document.getElementById("debug");
 const popOutBtn = document.getElementById("popOutBtn");
-const autoplayChk = document.getElementById("autoplayChk"); // ✅ NEW
+const autoplayChk = document.getElementById("autoplayChk");
 
 // ===== State =====
 const seasons = {};
 let currentSeason = null;
 let currentIndex = 0;
 
+// ===== Helpers =====
 function driveListUrl(folderId) {
-  const q = `'${folderId}' in parents and trashed=false`;
-  // request mimeType so we can detect mp4/video files
+  const q = `'${folderId}' in parents AND trashed=false`;
   return `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${API_KEY}&fields=files(id,name,mimeType,webViewLink,thumbnailLink)&pageSize=500&orderBy=name`;
 }
 
-async function init() {
-  if (!iframeEl) {
-    iframeEl = document.createElement('iframe');
-    iframeEl.id = 'drive-iframe';
-    iframeEl.style.display = 'none';
-    iframeEl.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
-    iframeEl.setAttribute('allowfullscreen', 'true');
-    const wrap = document.getElementById('playerWrap') || document.body;
-    wrap.insertBefore(iframeEl, wrap.firstChild.nextSibling || null);
-  }
+function updateStatusForEpisode(seasonId, fileName) {
+  // Determine which show section is visible
+  const isBojack = seasonId.startsWith('s');
+  const showSection = document.getElementById(isBojack ? 'bojack-season' : 'regular-season');
+  const status = showSection.querySelector('.status-bar');
+  if (!status) return;
 
+  // Season label: from the button with matching data-target
+  const btn = showSection.querySelector(`.season-toggle[data-target="${seasonId}"]`);
+  const seasonLabel = btn ? (btn.getAttribute('data-season-label') || '—') : '—';
+  const showName = btn ? (btn.getAttribute('data-show') || '—') : (isBojack ? 'Bojack Horseman' : 'Regular Show');
+
+  status.querySelector('[data-role="show"]').textContent = showName;
+  status.querySelector('[data-role="season"]').textContent = seasonLabel;
+  status.querySelector('[data-role="episode"]').textContent = fileName || '—';
+}
+
+// ===== Init =====
+async function init() {
   for (const seasonId of Object.keys(FOLDERS)) {
+    const folderId = FOLDERS[seasonId];
+    if (!folderId) {
+      seasons[seasonId] = [];
+      populateSeasonList(seasonId, []);
+      continue;
+    }
     try {
-      const url = driveListUrl(FOLDERS[seasonId]);
-      const res = await fetch(url);
+      const res = await fetch(driveListUrl(folderId));
       if (!res.ok) throw new Error('Drive API failed: ' + res.status);
       const json = await res.json();
-      const files = (json.files || []).slice().sort((a,b) => a.name.localeCompare(b.name));
+      let files = (json.files || []);
+
+      if (VIDEO_ONLY) {
+        files = files.filter(f => {
+          const mime = (f.mimeType || '').toLowerCase();
+          const name = (f.name || '').toLowerCase();
+          return mime.startsWith('video/') || name.endsWith('.mp4') || name.endsWith('.mkv') || name.endsWith('.webm');
+        });
+      }
+
+      files.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
       seasons[seasonId] = files;
       populateSeasonList(seasonId, files);
     } catch (e) {
@@ -78,7 +113,8 @@ function populateSeasonList(seasonId, files) {
   }
   files.forEach((f, i) => {
     const li = document.createElement('li');
-    li.textContent = f.name || ('Track ' + (i+1));
+    li.textContent = f.name || ('Track ' + (i + 1));
+    li.title = f.name || ('Track ' + (i + 1)); // tooltip for full name
     li.dataset.season = seasonId;
     li.dataset.index = i;
     li.onclick = () => playSeasonIndex(seasonId, i);
@@ -92,86 +128,69 @@ function playSeasonIndex(seasonId, idx) {
   currentSeason = seasonId;
   currentIndex = idx;
   const f = list[idx];
-  playFile(f, seasonId, idx);
+  playFile(f);
+
+  // highlight current item
   const ul = document.getElementById('videoList-' + seasonId.replace('s','s'));
   if (ul) {
     Array.from(ul.querySelectorAll('li')).forEach((li, i) => li.classList.toggle('current', i === idx));
   }
+
+  // update status with episode name
+  updateStatusForEpisode(seasonId, f.name || '');
 }
 
-function playFile(f, seasonId, idx) {
+function playFile(f) {
   if (!f) return;
 
-  // alt=media endpoint (serves raw file bytes with correct headers) — preferred for direct playback
+  // Prefer Google Drive alt=media for native playback
   const apiAltMedia = `https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}`;
-  // traditional uc download link (sometimes works but can return HTML for large files)
-  const directUc = `https://drive.google.com/uc?export=download&id=${f.id}`;
   const previewUrl = `https://drive.google.com/file/d/${f.id}/preview`;
 
   const name = (f.name || '').toLowerCase();
   const mime = (f.mimeType || '').toLowerCase();
 
-  let tryNative = false;
-  let sourceUrl = directUc;
+  let canNative = false;
+  let sourceUrl = apiAltMedia;
   let sourceType = mime || '';
 
   if (mime.startsWith('video/')) {
-    tryNative = true;
-    sourceUrl = apiAltMedia;
-    sourceType = mime;
+    canNative = true;
   } else if (name.endsWith('.mp4')) {
-    tryNative = true;
-    sourceUrl = apiAltMedia;
+    canNative = true;
     sourceType = 'video/mp4';
-  } else {
-    tryNative = false;
   }
 
-  if (tryNative && videoEl) {
-    try {
-      videoEl.pause();
-    } catch(e){}
-    videoEl.removeAttribute('poster');
-    while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
-    const sourceEl = document.createElement('source');
-    sourceEl.src = sourceUrl;
-    if (sourceType) sourceEl.type = sourceType;
-    videoEl.appendChild(sourceEl);
-
-    videoEl.style.display = 'block';
-    if (iframeEl) iframeEl.style.display = 'none';
-    if (openBtn) openBtn.href = f.webViewLink || previewUrl;
-    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = `Trying native playback (${sourceType || 'unknown type'}) — ${sourceUrl}`; }
-
-    videoEl.load();
-    videoEl.play().catch(err => {
-      console.warn('Native play() failed; falling back to iframe: ', err);
-      fallbackToIframe(f);
-    });
-  } else {
-    fallbackToIframe(f);
+  if (!canNative) {
+    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = 'This file type may not play natively. Use "Open in Google Drive" or "Pop out".'; }
+    if (openBtn) openBtn.href = previewUrl;
+    return;
   }
-}
 
-function fallbackToIframe(f) {
-  if (!f) return;
-  const previewUrl = `https://drive.google.com/file/d/${f.id}/preview`;
-  try {
-    if (videoEl) { try { videoEl.pause(); } catch(e){} videoEl.removeAttribute('src'); videoEl.style.display = 'none'; while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild); }
-    if (iframeEl) { iframeEl.src = previewUrl; iframeEl.style.width = '100%'; iframeEl.style.height = '480px'; iframeEl.style.display = 'block'; }
-    if (openBtn) openBtn.href = f.webViewLink || previewUrl;
-    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = 'Native playback failed — using Drive preview.'; }
-  } catch(e){ console.warn('fallback error', e); }
+  try { videoEl.pause(); } catch(e){}
+  while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+
+  const sourceEl = document.createElement('source');
+  sourceEl.src = sourceUrl;
+  if (sourceType) sourceEl.type = sourceType;
+  videoEl.appendChild(sourceEl);
+
+  videoEl.style.display = 'block';
+  if (openBtn) openBtn.href = previewUrl;
+  if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = `Playing natively (${sourceType || 'unknown'})`; }
+
+  videoEl.load();
+  videoEl.play().catch(() => {
+    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = 'Native play failed. Use "Open in Google Drive" or "Pop out".'; }
+  });
 }
 
 if (videoEl) {
-  videoEl.addEventListener('error', () => { fallbackToIframe(seasons[currentSeason] && seasons[currentSeason][currentIndex]); });
-
-  // ✅ NEW: Autoplay next when video ends
-  videoEl.addEventListener("ended", () => {
-    if (autoplayChk && autoplayChk.checked) {
-      next();
-    }
+  videoEl.addEventListener('error', () => {
+    if (debugEl) { debugEl.style.display = 'block'; debugEl.innerText = 'Playback error. Try "Open in Google Drive" / "Pop out".'; }
+  });
+  videoEl.addEventListener('ended', () => {
+    if (autoplayChk && autoplayChk.checked) next();
   });
 }
 
@@ -194,7 +213,7 @@ if (popOutBtn) popOutBtn.addEventListener('click', () => {
   const url = `https://drive.google.com/file/d/${f.id}/preview`;
   const w = Math.round(window.screen.availWidth * 0.85);
   const h = Math.round(window.screen.availHeight * 0.85);
-  const features = 'resizable=yes,scrollbars=yes,width=' + w + ',height=' + h;
+  const features = `resizable=yes,scrollbars=yes,width=${w},height=${h}`;
   const popup = window.open(url, '_blank', features);
   if (popup) popup.focus();
 });

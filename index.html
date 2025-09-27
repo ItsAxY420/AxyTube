@@ -8,54 +8,90 @@
 </head>
 <body>
   <div class="container">
-    <h1>AxyTube</h1>
-    <p class="subtitle">Axy Favourite Shows to fall asleep by</p>
+    <header class="page-header">
+      <h1>AxyTube</h1>
+      <p class="subtitle">Axy Favourite Shows to fall asleep by</p>
+    </header>
 
-    <!-- Bojack Horseman Tab (closed by default) -->
-    <button class="tab-btn" id="bojackToggle">Bojack Horseman</button>
-
-    <div id="bojack-season" class="season" style="display:none;">
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s1')">Season 1</button>
-        <div id="s1" class="season-content">
-          <ul class="list" id="videoList-s1"></ul>
-        </div>
-      </div>
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s2')">Season 2</button>
-        <div id="s2" class="season-content">
-          <ul class="list" id="videoList-s2"></ul>
-        </div>
-      </div>
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s3')">Season 3</button>
-        <div id="s3" class="season-content">
-          <ul class="list" id="videoList-s3"></ul>
-        </div>
-      </div>
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s4')">Season 4</button>
-        <div id="s4" class="season-content">
-          <ul class="list" id="videoList-s4"></ul>
-        </div>
-      </div>
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s5')">Season 5</button>
-        <div id="s5" class="season-content">
-          <ul class="list" id="videoList-s5"></ul>
-        </div>
-      </div>
-      <div class="season-block">
-        <button class="season-toggle" onclick="toggleSeason('s6')">Season 6</button>
-        <div id="s6" class="season-content">
-          <ul class="list" id="videoList-s6"></ul>
-        </div>
-      </div>
+    <!-- Pinned show tabs -->
+    <div class="tabs-row">
+      <button class="tab-btn" id="bojackToggle" aria-controls="bojack-season" aria-expanded="false">Bojack Horseman</button>
+      <button class="tab-btn" id="regularToggle" aria-controls="regular-season" aria-expanded="false">Regular Show</button>
     </div>
 
+    <!-- BOJACK -->
+    <section id="bojack-season" class="season" hidden>
+      <!-- Pinned seasons row -->
+      <div class="seasons-row">
+        <button class="season-toggle" data-target="s1" data-show="Bojack Horseman" data-season-label="Season 1">Season 1</button>
+        <button class="season-toggle" data-target="s2" data-show="Bojack Horseman" data-season-label="Season 2">Season 2</button>
+        <button class="season-toggle" data-target="s3" data-show="Bojack Horseman" data-season-label="Season 3">Season 3</button>
+        <button class="season-toggle" data-target="s4" data-show="Bojack Horseman" data-season-label="Season 4">Season 4</button>
+        <button class="season-toggle" data-target="s5" data-show="Bojack Horseman" data-season-label="Season 5">Season 5</button>
+        <button class="season-toggle" data-target="s6" data-show="Bojack Horseman" data-season-label="Season 6">Season 6</button>
+      </div>
+
+      <!-- Status bar (visible only when a season is open) -->
+      <div class="status-bar" id="status-bojack" hidden>
+        <span class="crumb-label">Show:</span> <span class="crumb-value" data-role="show">—</span>
+        <span class="crumb-sep">•</span>
+        <span class="crumb-label">Season:</span> <span class="crumb-value" data-role="season">—</span>
+        <span class="crumb-sep">•</span>
+        <span class="crumb-label">Episode:</span> <span class="crumb-value" data-role="episode">—</span>
+      </div>
+
+      <!-- Episodes panel (hidden until a season is opened) -->
+      <div class="season-scroll" hidden>
+        <div id="s1" class="season-content" hidden><ul class="list" id="videoList-s1"></ul></div>
+        <div id="s2" class="season-content" hidden><ul class="list" id="videoList-s2"></ul></div>
+        <div id="s3" class="season-content" hidden><ul class="list" id="videoList-s3"></ul></div>
+        <div id="s4" class="season-content" hidden><ul class="list" id="videoList-s4"></ul></div>
+        <div id="s5" class="season-content" hidden><ul class="list" id="videoList-s5"></ul></div>
+        <div id="s6" class="season-content" hidden><ul class="list" id="videoList-s6"></ul></div>
+      </div>
+    </section>
+
+    <!-- REGULAR SHOW -->
+    <section id="regular-season" class="season" hidden>
+      <!-- Pinned seasons row -->
+      <div class="seasons-row">
+        <button class="season-toggle" data-target="r1" data-show="Regular Show" data-season-label="Season 1">Season 1</button>
+        <button class="season-toggle" data-target="r2" data-show="Regular Show" data-season-label="Season 2">Season 2</button>
+        <button class="season-toggle" data-target="r3" data-show="Regular Show" data-season-label="Season 3">Season 3</button>
+        <button class="season-toggle" data-target="r4" data-show="Regular Show" data-season-label="Season 4">Season 4</button>
+        <button class="season-toggle" data-target="r5" data-show="Regular Show" data-season-label="Season 5">Season 5</button>
+        <button class="season-toggle" data-target="r6" data-show="Regular Show" data-season-label="Season 6">Season 6</button>
+        <button class="season-toggle" data-target="r7" data-show="Regular Show" data-season-label="Season 7">Season 7</button>
+        <button class="season-toggle" data-target="r8" data-show="Regular Show" data-season-label="Season 8">Season 8</button>
+        <button class="season-toggle" data-target="r9" data-show="Regular Show" data-season-label="Movie (2015)">Movie (2015)</button>
+      </div>
+
+      <!-- Status bar (visible only when a season is open) -->
+      <div class="status-bar" id="status-regular" hidden>
+        <span class="crumb-label">Show:</span> <span class="crumb-value" data-role="show">—</span>
+        <span class="crumb-sep">•</span>
+        <span class="crumb-label">Season:</span> <span class="crumb-value" data-role="season">—</span>
+        <span class="crumb-sep">•</span>
+        <span class="crumb-label">Episode:</span> <span class="crumb-value" data-role="episode">—</span>
+      </div>
+
+      <!-- Episodes panel (hidden until a season is opened) -->
+      <div class="season-scroll" hidden>
+        <div id="r1" class="season-content" hidden><ul class="list" id="videoList-r1"></ul></div>
+        <div id="r2" class="season-content" hidden><ul class="list" id="videoList-r2"></ul></div>
+        <div id="r3" class="season-content" hidden><ul class="list" id="videoList-r3"></ul></div>
+        <div id="r4" class="season-content" hidden><ul class="list" id="videoList-r4"></ul></div>
+        <div id="r5" class="season-content" hidden><ul class="list" id="videoList-r5"></ul></div>
+        <div id="r6" class="season-content" hidden><ul class="list" id="videoList-r6"></ul></div>
+        <div id="r7" class="season-content" hidden><ul class="list" id="videoList-r7"></ul></div>
+        <div id="r8" class="season-content" hidden><ul class="list" id="videoList-r8"></ul></div>
+        <div id="r9" class="season-content" hidden><ul class="list" id="videoList-r9"></ul></div>
+      </div>
+    </section>
+
+    <!-- Player (native only) -->
     <div id="playerWrap">
-      <video id="video-player" controls playsinline webkit-playsinline x-webkit-airplay="allow" style="display:block;"></video>
-      <iframe id="drive-iframe" style="display:none;"></iframe>
+      <video id="video-player" controls playsinline webkit-playsinline x-webkit-airplay="allow"></video>
 
       <div class="controls">
         <button id="prevBtn">⟵ Prev</button>
@@ -69,23 +105,81 @@
 
       <div id="empty" class="empty" style="display:none;">No playable videos found in this folder.</div>
       <div id="debug" class="debug" style="display:none;"></div>
-      <div class="note">Tip: if a file still shows black, open it in Google Drive and confirm it is set to "Anyone with the link — Viewer".</div>
+      <div class="note">Tip: if native playback fails for a file type, use “Open in Google Drive” or “Pop out”.</div>
     </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const toggle = document.getElementById('bojackToggle');
-      toggle.addEventListener('click', function () {
-        const box = document.getElementById('bojack-season');
-        box.style.display = box.style.display === 'block' ? 'none' : 'block';
-      });
-    });
-    function toggleSeason(id) {
-      const section = document.getElementById(id);
-      section.style.display = section.style.display === 'block' ? 'none' : 'block';
+    // Show toggles: open/close; only one show open at a time.
+    const bojackToggle = document.getElementById('bojackToggle');
+    const regularToggle = document.getElementById('regularToggle');
+    const bojackSec = document.getElementById('bojack-season');
+    const regularSec = document.getElementById('regular-season');
+
+    function closeShow(sectionEl, buttonEl) {
+      sectionEl.setAttribute('hidden', '');
+      buttonEl.setAttribute('aria-expanded', 'false');
+      const scroll = sectionEl.querySelector('.season-scroll');
+      const status = sectionEl.querySelector('.status-bar');
+      if (scroll) scroll.setAttribute('hidden','');
+      if (status) status.setAttribute('hidden','');
+      sectionEl.querySelectorAll('.season-content').forEach(el => el.setAttribute('hidden',''));
     }
+    function openShow(sectionEl, buttonEl) {
+      if (sectionEl !== bojackSec) closeShow(bojackSec, bojackToggle);
+      if (sectionEl !== regularSec) closeShow(regularSec, regularToggle);
+      sectionEl.removeAttribute('hidden');
+      buttonEl.setAttribute('aria-expanded', 'true');
+    }
+
+    bojackToggle.addEventListener('click', () => {
+      const isHidden = bojackSec.hasAttribute('hidden');
+      if (isHidden) openShow(bojackSec, bojackToggle); else closeShow(bojackSec, bojackToggle);
+    });
+    regularToggle.addEventListener('click', () => {
+      const isHidden = regularSec.hasAttribute('hidden');
+      if (isHidden) openShow(regularSec, regularToggle); else closeShow(regularSec, regularToggle);
+    });
+
+    // Season toggles inside active show
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.season-toggle');
+      if (!btn) return;
+
+      const showSection = btn.closest('.season');
+      const scroll = showSection.querySelector('.season-scroll');
+      const status = showSection.querySelector('.status-bar');
+      const targetId = btn.getAttribute('data-target');
+      const targetEl = showSection.querySelector('#' + targetId);
+      if (!targetEl) return;
+
+      const isOpen = !targetEl.hasAttribute('hidden');
+
+      // Close all seasons first
+      showSection.querySelectorAll('.season-content').forEach(el => el.setAttribute('hidden', ''));
+
+      if (isOpen) {
+        // same season clicked -> close panel + status
+        scroll.setAttribute('hidden', '');
+        status.setAttribute('hidden', '');
+      } else {
+        // open clicked season
+        targetEl.removeAttribute('hidden');
+        scroll.removeAttribute('hidden');
+
+        // Update status bar (show + season; episode cleared)
+        const showName = btn.getAttribute('data-show') || '—';
+        const seasonLabel = btn.getAttribute('data-season-label') || '—';
+        status.querySelector('[data-role="show"]').textContent = showName;
+        status.querySelector('[data-role="season"]').textContent = seasonLabel;
+        status.querySelector('[data-role="episode"]').textContent = '—';
+        status.removeAttribute('hidden');
+
+        scroll.scrollTop = 0;
+      }
+    });
   </script>
+
   <script src="script.js"></script>
 </body>
 </html>

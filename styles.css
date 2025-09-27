@@ -1,73 +1,225 @@
-/* styles.css */
+/* ===== Theme & Variables ===== */
+:root{
+  --tabs-h: 52px;         /* shows row height (sticky) */
+  --seasons-h: 46px;      /* seasons row height (sticky) */
 
+  --bg: #111;             /* page background */
+  --panel: #0D0D0D;       /* episodes/status panel (a bit darker, not black) */
+  --tile-bg: #151515;     /* episode card background */
+  --tile-bg-hover: #1A1A1A;
+  --tile-border: #232323; /* subtle border */
+  --text: #E5E7EB;
+
+  --accent: #2563EB;      /* selection outline */
+}
+
+/* ===== Frame ===== */
+html, body { height: 100%; }
 body {
-  background: #111;
-  color: #eee;
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  display:flex;
-  justify-content:center;
+  display: flex;
+  justify-content: center;
 }
-
 .container {
-  padding: 20px;
   width: 100%;
   max-width: 1100px;
   box-sizing: border-box;
+  padding: 20px;
 }
 
-h1 { margin: 6px 0; }
-.subtitle { margin: 0 0 12px 0; color: #ccc; }
+/* ===== Header ===== */
+.page-header h1 { margin: 0 0 6px; font-size: 24px; }
+.page-header .subtitle { margin: 0 0 16px; opacity: 0.8; }
 
-.tab-btn, .season-toggle, .controls button {
-  background: #0a2a5e;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  margin: 6px;
-  border-radius: 6px;
+/* ===== Show tabs (sticky) ===== */
+.tab-btn {
+  background: #1f2937;
+  color: var(--text);
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 8px 12px;
   cursor: pointer;
+  white-space: nowrap;
 }
-.tab-btn:hover, .season-toggle:hover, .controls button:hover {
-  background: #163d82;
+.tab-btn:hover { background: #2a3446; }
+
+.tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--bg);
+  padding: 8px 0;
+  min-height: var(--tabs-h);
+  box-shadow: 0 2px 0 rgba(255,255,255,0.06);
+  margin-bottom: 10px;
 }
 
-#playerWrap {
-  margin: 20px auto;
+/* ===== Show container ===== */
+.season {
+  margin: 10px 0 16px;
+  position: relative;
+
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
+
+  border: 1px solid #1f2530;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
 }
 
+/* Hidden helper */
+[hidden] { display: none !important; }
+
+/* ===== Seasons row (sticky under show tabs) ===== */
+.seasons-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+
+  position: sticky;
+  top: var(--tabs-h);
+  z-index: 990;
+  background: var(--bg);
+  padding: 6px 10px;
+  min-height: var(--seasons-h);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.season-toggle {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.season-toggle:hover { background: #161a22; }
+
+/* ===== Status bar (NO CLIPPING, no overlap) ===== */
+.status-bar {
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 12px;
+  border-top: 1px solid #1f2530;
+  border-bottom: 1px solid #1f2530;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status-bar .crumb-label { opacity: 0.8; }
+.status-bar .crumb-value { font-weight: 600; }
+.status-bar .crumb-sep { opacity: 0.55; }
+
+/* ===== Episodes panel ===== */
+.season-scroll {
+  flex: 0 0 auto;
+  width: 100%;
+  max-height: 70vh;   /* scrolls only if needed */
+  overflow: auto;
+  padding: 12px 12px 14px;  /* extra top padding so first row never clips */
+  background: var(--panel);
+  box-sizing: border-box;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Each season's episodes block */
+.season-content { margin-top: 0; }
+
+/* ===== Episodes grid ===== */
+.list { list-style: none; padding: 0; margin: 0; }
+
+.season-content .list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.season-content .list li {
+  box-sizing: border-box;
+  padding: 10px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  color: var(--text);
+  background: var(--tile-bg);
+  border: 1px solid var(--tile-border);
+  border-radius: 10px;
+
+  min-height: 78px;
+  max-height: 150px;
+  overflow: hidden;
+
+  white-space: normal;
+  word-break: break-word;
+
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.season-content .list li:hover {
+  background: var(--tile-bg-hover);
+  transform: translateY(-1px);
+  border-color: #2a2a2a;
+}
+.season-content .list li.current {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  font-weight: 600;
+}
+
+/* Scrollbar styling for episodes panel */
+.season-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.season-scroll::-webkit-scrollbar-thumb { background: #313131; border-radius: 8px; }
+.season-scroll::-webkit-scrollbar-track { background: #181818; border-radius: 8px; }
+
+/* ===== Player & controls (16:9, no black bars) ===== */
+#playerWrap { margin-top: 14px; }
+
+/* Keep a perfect 16:9 for native player */
 #video-player {
   width: 100%;
-  max-width: 960px;
-  aspect-ratio: 16/9;
-  background: #000;
+  aspect-ratio: 16 / 9; /* 720p friendly */
+  height: auto;
+  display: none;        /* shown when a video starts */
+  border: 0;
   border-radius: 8px;
+  background: #000;
+  object-fit: cover;    /* fill without black bars */
 }
 
-#drive-iframe { width: 100%; max-width: 960px; height: 540px; border: 0; }
-
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 8px 0;
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
 }
-.list li {
-  padding: 6px 8px;
-  border-radius: 4px;
+.controls button {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
   cursor: pointer;
-  background: rgba(255,255,255,0.03);
-  margin: 4px 0;
-  text-align: left;
 }
-.list li.current {
-  background: rgba(96,150,255,0.14);
-  font-weight: 700;
-}
-.debug { color: #ffcc00; }
-.note { color: #bbb; margin-top: 8px; }
+.controls button:hover { filter: brightness(1.06); }
+
+/* misc */
+.empty { opacity: 0.8; }
+.debug { color: #ffcc00; margin-top: 6px; }
+.note  { color: #bbb; margin-top: 8px; }
